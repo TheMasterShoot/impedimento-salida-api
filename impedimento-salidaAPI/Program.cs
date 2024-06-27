@@ -29,8 +29,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     // Configura opciones de serialización si es necesario
-    //options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-    //options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     //options.SerializerSettings.Converters.Add(new CartaConverter());
     // Puedes agregar más configuraciones según tus necesidades
 });

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
@@ -53,6 +54,47 @@ namespace impedimento_salidaAPI.Controllers
             }
 
             _context.Entry(solicitudLevantamiento).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SolicitudLevantamientoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/SolicitudLevantamiento/5
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchSolicitudLevantamiento(int id, [FromBody] JsonPatchDocument<SolicitudLevantamiento> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
+            if (solicitudLevantamiento == null)
+            {
+                return NotFound();
+            }
+
+            patchDoc.ApplyTo(solicitudLevantamiento, ModelState);
+
+            if (!TryValidateModel(solicitudLevantamiento))
+            {
+                return ValidationProblem(ModelState);
+            }
 
             try
             {
