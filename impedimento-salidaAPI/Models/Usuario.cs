@@ -19,7 +19,7 @@ public partial class Usuario
 
     public string Password { get; set; } = null!;
 
-    public virtual Estatus Estatus { get; set; } = null!;
+    public virtual Estatus? Estatus { get; set; }
 
-    public virtual Role Rol { get; set; } = null!;
+    public virtual Role? Rol { get; set; }
 }

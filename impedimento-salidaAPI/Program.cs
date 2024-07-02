@@ -1,19 +1,24 @@
 using impedimento_salidaAPI.Context;
+using impedimento_salidaAPI.Custom;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
+// configuracion de conexion a base de datos
 var connectionString = builder.Configuration.GetConnectionString("Connection");
 
 builder.Services.AddDbContext<ImpedimentoSalidaContext>(
         options => options.UseSqlServer(connectionString)
 );
 
+ // configuracion de politicas de cors
 builder.Services.AddCors(options =>
 {
     
@@ -25,7 +30,29 @@ builder.Services.AddCors(options =>
                        });
 });
 
-// Configura los servicios para usar Newtonsoft.Json
+// Agregar soporte para JWT
+builder.Services.AddSingleton<Utilities>();
+
+builder.Services.AddAuthentication(config => {
+    config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(config =>
+{
+    config.RequireHttpsMetadata = false;
+    config.SaveToken = true;
+    config.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        IssuerSigningKey = new SymmetricSecurityKey
+        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"]!))
+    };
+});
+
+// Configuracion de los servicios para usar Newtonsoft.Json
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     // Configura opciones de serialización si es necesario
@@ -35,6 +62,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     // Puedes agregar más configuraciones según tus necesidades
 });
 
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,6 +80,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

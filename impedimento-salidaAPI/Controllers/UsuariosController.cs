@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using impedimento_salidaAPI.Custom;
+
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -15,10 +17,12 @@ namespace impedimento_salidaAPI.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly ImpedimentoSalidaContext _context;
+        private readonly Utilities _utilities;
 
-        public UsuariosController(ImpedimentoSalidaContext context)
+        public UsuariosController(ImpedimentoSalidaContext context, Utilities utilities)
         {
             _context = context;
+            _utilities = utilities;
         }
 
         // GET: api/Usuarios
@@ -47,12 +51,35 @@ namespace impedimento_salidaAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
         {
+            // Validar que el ID en la URL coincide con el ID del usuario
             if (id != usuario.Id)
             {
-                return BadRequest();
+                return BadRequest("El ID proporcionado en la URL no coincide con el ID del usuario.");
             }
 
-            _context.Entry(usuario).State = EntityState.Modified;
+            // Buscar el usuario existente en la base de datos
+            var usuarioExistente = await _context.Usuarios.FindAsync(id);
+
+            if (usuarioExistente == null)
+            {
+                return NotFound("El usuario no existe.");
+            }
+
+            // Actualizar propiedades del usuario existente con los valores proporcionados
+            usuarioExistente.Estatusid = usuario.Estatusid;
+            usuarioExistente.Rolid = usuario.Rolid;
+            usuarioExistente.Nombre = usuario.Nombre;
+            usuarioExistente.Apellido = usuario.Apellido;
+            usuarioExistente.Username = usuario.Username;
+
+            // Solo actualizar la contraseña si se proporciona una nueva
+            if (!string.IsNullOrEmpty(usuario.Password))
+            {
+                usuarioExistente.Password = _utilities.encriptarSHA256(usuario.Password);
+            }
+
+            // Marcar la entidad como modificada
+            _context.Entry(usuarioExistente).State = EntityState.Modified;
 
             try
             {
@@ -62,7 +89,7 @@ namespace impedimento_salidaAPI.Controllers
             {
                 if (!UsuarioExists(id))
                 {
-                    return NotFound();
+                    return NotFound("El usuario no existe.");
                 }
                 else
                 {
@@ -70,7 +97,7 @@ namespace impedimento_salidaAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return NoContent(); // O puede devolver Ok(usuarioExistente) para devolver el usuario actualizado
         }
 
         // POST: api/Usuarios
@@ -78,10 +105,24 @@ namespace impedimento_salidaAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
-            _context.Usuarios.Add(usuario);
+
+            var modeloUsuario = new Usuario
+            {
+                Estatusid = usuario.Estatusid,
+                Rolid = usuario.Rolid,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Username = usuario.Username,
+                Password = _utilities.encriptarSHA256(usuario.Password)
+            };
+
+            await _context.Usuarios.AddAsync(modeloUsuario);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUsuario", new { id = usuario.Id }, usuario);
+            if (modeloUsuario.Id != 0)
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true });
+            else
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
         }
 
         // DELETE: api/Usuarios/5
