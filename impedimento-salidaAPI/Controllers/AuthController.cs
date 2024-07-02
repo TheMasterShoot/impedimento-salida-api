@@ -59,5 +59,13 @@ namespace impedimento_salidaAPI.Controllers
             else
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilities.generarJWT(usuarioEncontrado) });
         }
+
+        [HttpGet]
+        [Route("ValidarToken")]
+        public ActionResult ValidarToken([FromQuery]string token)
+        {
+            bool respuesta = _utilities.validarToken(token);
+            return StatusCode(StatusCodes.Status200OK, new { isSuccess = respuesta });
+        }
     }
 }
