@@ -24,6 +24,10 @@ public partial class ImpedimentoSalidaContext : DbContext
 
     public virtual DbSet<Estatus> Estatuses { get; set; }
 
+    public virtual DbSet<Menu> Menus { get; set; }
+
+    public virtual DbSet<Menurol> Menurols { get; set; }
+
     public virtual DbSet<Rechazo> Rechazos { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -172,6 +176,38 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasForeignKey(d => d.TipoCodigo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ESTATUS_TIPO_CODIGO");
+        });
+
+        modelBuilder.Entity<Menu>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__MENU__3214EC273254EDD3");
+
+            entity.ToTable("MENU");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("DESCRIPCION");
+            entity.Property(e => e.Icono)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ICONO");
+            entity.Property(e => e.Url)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("URL");
+        });
+
+        modelBuilder.Entity<Menurol>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__MENUROL__3214EC27E6D29EB8");
+
+            entity.ToTable("MENUROL");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Idmenu).HasColumnName("IDMENU");
+            entity.Property(e => e.Idrol).HasColumnName("IDROL");
         });
 
         modelBuilder.Entity<Rechazo>(entity =>
