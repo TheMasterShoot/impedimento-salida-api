@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using AutoMapper;
+using impedimento_salidaAPI.Models.DTOs;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -15,23 +17,53 @@ namespace impedimento_salidaAPI.Controllers
     public class CertificacionExistenciaController : ControllerBase
     {
         private readonly ImpedimentoSalidaContext _context;
+        private readonly IMapper _mapper;
 
-        public CertificacionExistenciaController(ImpedimentoSalidaContext context)
+
+        public CertificacionExistenciaController(ImpedimentoSalidaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/CertificacionExistencia
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CertificacionExistencium>>> GetCertificacionExistencia()
+        public async Task<ActionResult<IEnumerable<CertificacionExistenciumDTO>>> GetCertificacionExistencia()
         {
-            return await _context.CertificacionExistencia.ToListAsync();
+            var certificacionesExistencia = await _context.CertificacionExistencia
+                .Include(c => c.Estatus)
+                .ToListAsync();
+            var certificacionesExistenciaDTO = _mapper.Map<List<CertificacionExistenciumDTO>>(certificacionesExistencia);
+            return Ok(certificacionesExistenciaDTO);
         }
 
         // GET: api/CertificacionExistencia/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CertificacionExistencium>> GetCertificacionExistencium(int id)
+        public async Task<ActionResult<CertificacionExistenciumDTO>> GetCertificacionExistencium(int id)
         {
+            var certificacionExistencium = await _context.CertificacionExistencia
+               .Include(c => c.Estatus)
+               .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (certificacionExistencium == null)
+            {
+                return NotFound();
+            }
+
+            var certificacionesExistenciaDTO = _mapper.Map<List<CertificacionExistenciumDTO>>(certificacionExistencium);
+            return Ok(certificacionesExistenciaDTO);
+        }
+
+        // PUT: api/CertificacionExistencia/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCertificacionExistencium(int id, CertificacionExistenciumDTO certificacionExistenciumDTO)
+        {
+            if (id != certificacionExistenciumDTO.Id)
+            {
+                return BadRequest();
+            }
+
             var certificacionExistencium = await _context.CertificacionExistencia.FindAsync(id);
 
             if (certificacionExistencium == null)
@@ -39,18 +71,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            return certificacionExistencium;
-        }
-
-        // PUT: api/CertificacionExistencia/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCertificacionExistencium(int id, CertificacionExistencium certificacionExistencium)
-        {
-            if (id != certificacionExistencium.Id)
-            {
-                return BadRequest();
-            }
+            _mapper.Map(certificacionExistenciumDTO, certificacionExistencium);
 
             _context.Entry(certificacionExistencium).State = EntityState.Modified;
 
@@ -76,8 +97,9 @@ namespace impedimento_salidaAPI.Controllers
         // POST: api/CertificacionExistencia
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CertificacionExistencium>> PostCertificacionExistencium(CertificacionExistencium certificacionExistencium)
+        public async Task<ActionResult<CertificacionExistencium>> PostCertificacionExistencium(CertificacionExistenciumDTO certificacionExistenciumDTO)
         {
+            var certificacionExistencium = _mapper.Map<CertificacionExistencium>(certificacionExistenciumDTO);
             _context.CertificacionExistencia.Add(certificacionExistencium);
             await _context.SaveChangesAsync();
 

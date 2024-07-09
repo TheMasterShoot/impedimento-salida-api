@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using AutoMapper;
+using impedimento_salidaAPI.Models.DTOs;
+using System.Data;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -15,23 +18,51 @@ namespace impedimento_salidaAPI.Controllers
     public class RolesController : ControllerBase
     {
         private readonly ImpedimentoSalidaContext _context;
+        private readonly IMapper _mapper;
 
-        public RolesController(ImpedimentoSalidaContext context)
+
+        public RolesController(ImpedimentoSalidaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
+        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRoles()
         {
-            return await _context.Roles.ToListAsync();
+            var roles = await _context.Roles
+                .ToListAsync();
+            var rolesDTO = _mapper.Map<List<RoleDTO>>(roles);
+            return Ok(rolesDTO);
         }
 
         // GET: api/Roles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRole(int id)
+        public async Task<ActionResult<RoleDTO>> GetRole(int id)
         {
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            var rolesDTO = _mapper.Map<List<RoleDTO>>(role);
+            return Ok(rolesDTO);
+        }
+
+        // PUT: api/Roles/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutRole(int id, RoleDTO roleDTO)
+        {
+            if (id != roleDTO.Id)
+            {
+                return BadRequest();
+            }
+
             var role = await _context.Roles.FindAsync(id);
 
             if (role == null)
@@ -39,18 +70,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            return role;
-        }
-
-        // PUT: api/Roles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRole(int id, Role role)
-        {
-            if (id != role.Id)
-            {
-                return BadRequest();
-            }
+            _mapper.Map(roleDTO, role);
 
             _context.Entry(role).State = EntityState.Modified;
 
@@ -76,8 +96,9 @@ namespace impedimento_salidaAPI.Controllers
         // POST: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Role>> PostRole(Role role)
+        public async Task<ActionResult<Role>> PostRole(RoleDTO roleDTO)
         {
+            var role = _mapper.Map<Role>(roleDTO);
             _context.Roles.Add(role);
             await _context.SaveChangesAsync();
 

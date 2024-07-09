@@ -7,5 +7,7 @@
         public string Codigo { get; set; } = null!;
 
         public string Descripcion { get; set; } = null!;
+
+        public virtual ICollection<EstatusDTO>? Estatuses { get; set; }
     }
 }

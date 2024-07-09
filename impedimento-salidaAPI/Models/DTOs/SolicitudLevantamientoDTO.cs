@@ -16,7 +16,7 @@
 
         public string Apellido { get; set; } = null!;
 
-        public DateOnly FechaSolicitud { get; set; }
+        public DateOnly? FechaSolicitud { get; set; }
 
         public DateOnly? FechaAprobacion { get; set; }
 
@@ -31,5 +31,7 @@
         public byte[]? Sentencia { get; set; }
 
         public byte[]? NoRecurso { get; set; }
+
+        public virtual ICollection<RechazoDTO>? Rechazos { get; set; }
     }
 }

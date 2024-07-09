@@ -5,5 +5,9 @@
         public int Id { get; set; }
 
         public string Rol { get; set; } = null!;
+
+        public virtual ICollection<CiudadanoDTO>? Ciudadanos { get; set; }
+
+        public virtual ICollection<UsuarioDTO>? Usuarios { get; set; }
     }
 }

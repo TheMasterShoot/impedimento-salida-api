@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using AutoMapper;
+using impedimento_salidaAPI.Models.DTOs;
+using System.Net.NetworkInformation;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -15,41 +18,58 @@ namespace impedimento_salidaAPI.Controllers
     public class EstatusController : ControllerBase
     {
         private readonly ImpedimentoSalidaContext _context;
+        private readonly IMapper _mapper;
 
-        public EstatusController(ImpedimentoSalidaContext context)
+
+        public EstatusController(ImpedimentoSalidaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Estatus
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Estatus>>> GetEstatuses()
+        public async Task<ActionResult<IEnumerable<EstatusDTO>>> GetEstatuses()
         {
-            return await _context.Estatuses.ToListAsync();
+            var estatuses = await _context.Estatuses
+                .Include(c => c.TipoCodigoNavigation)
+                .ToListAsync();
+            var estatusDTO = _mapper.Map<List<CiudadanoDTO>>(estatuses);
+            return Ok(estatusDTO);
         }
 
         // GET: api/Estatus/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Estatus>> GetEstatus(int id)
+        public async Task<ActionResult<EstatusDTO>> GetEstatus(int id)
         {
-            var estatus = await _context.Estatuses.FindAsync(id);
+            var estatus = await _context.Estatuses
+                .Include(c => c.TipoCodigoNavigation)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (estatus == null)
             {
                 return NotFound();
             }
 
-            return estatus;
+            var estatusDTO = _mapper.Map<List<EstatusDTO>>(estatus);
+            return Ok(estatusDTO);
         }
 
         // PUT: api/Estatus/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEstatus(int id, Estatus estatus)
+        public async Task<IActionResult> PutEstatus(int id, EstatusDTO estatusDTO)
         {
-            if (id != estatus.Id)
+            if (id != estatusDTO.Id)
             {
                 return BadRequest();
+            }
+
+            var estatus = await _context.Estatuses.FindAsync(id);
+
+            if (estatus == null)
+            {
+                return NotFound();
             }
 
             _context.Entry(estatus).State = EntityState.Modified;
@@ -76,8 +96,9 @@ namespace impedimento_salidaAPI.Controllers
         // POST: api/Estatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Estatus>> PostEstatus(Estatus estatus)
+        public async Task<ActionResult<Estatus>> PostEstatus(EstatusDTO estatusDTO)
         {
+            var estatus = _mapper.Map<Estatus>(estatusDTO);
             _context.Estatuses.Add(estatus);
             await _context.SaveChangesAsync();
 

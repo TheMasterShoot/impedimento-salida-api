@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Text;
+using AutoMapper;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,6 +71,11 @@ builder.Services.AddSwaggerGen();
 
 // para envio de emails
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+
+// Agregar AutoMapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
 
 var app = builder.Build();
 

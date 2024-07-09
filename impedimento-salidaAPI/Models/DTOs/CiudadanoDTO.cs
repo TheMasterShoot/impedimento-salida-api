@@ -19,5 +19,10 @@
         public string? Telefono { get; set; }
 
         public string Password { get; set; } = null!;
+
+        public virtual ICollection<CertificacionExistenciumDTO>? CertificacionExistencia { get; set; }
+
+        public virtual ICollection<SolicitudLevantamientoDTO>? SolicitudLevantamientos { get; set; }
+
     }
 }

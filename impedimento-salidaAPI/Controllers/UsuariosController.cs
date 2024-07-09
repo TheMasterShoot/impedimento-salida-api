@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using impedimento_salidaAPI.Models.DTOs;
 using impedimento_salidaAPI.Custom;
+using AutoMapper;
 
 
 namespace impedimento_salidaAPI.Controllers
@@ -18,46 +20,55 @@ namespace impedimento_salidaAPI.Controllers
     {
         private readonly ImpedimentoSalidaContext _context;
         private readonly Utilities _utilities;
+        private readonly IMapper _mapper;
 
-        public UsuariosController(ImpedimentoSalidaContext context, Utilities utilities)
+        public UsuariosController(ImpedimentoSalidaContext context, Utilities utilities, IMapper mapper)
         {
             _context = context;
             _utilities = utilities;
+            _mapper = mapper;
         }
 
         // GET: api/Usuarios
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
+        public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetUsuarios()
         {
-            return await _context.Usuarios.ToListAsync();
+            var usuarios = await _context.Usuarios.
+                Include(u => u.Rol)
+                .Include(u => u.Estatus)
+                .ToListAsync();
+            var usuariosDTO = _mapper.Map<List<UsuarioDTO>>(usuarios);
+            return Ok(usuariosDTO);
         }
 
         // GET: api/Usuarios/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> GetUsuario(int id)
+        public async Task<ActionResult<UsuarioDTO>> GetUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _context.Usuarios
+                .Include(u => u.Rol)
+                .Include(u => u.Estatus)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (usuario == null)
             {
                 return NotFound();
             }
 
-            return usuario;
+            var usuarioDTO = _mapper.Map<UsuarioDTO>(usuario);
+            return Ok(usuarioDTO);
         }
 
         // PUT: api/Usuarios/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> PutUsuario(int id, UsuarioDTO usuarioDTO)
         {
-            // Validar que el ID en la URL coincide con el ID del usuario
-            if (id != usuario.Id)
+            if (id != usuarioDTO.Id)
             {
                 return BadRequest("El ID proporcionado en la URL no coincide con el ID del usuario.");
             }
 
-            // Buscar el usuario existente en la base de datos
             var usuarioExistente = await _context.Usuarios.FindAsync(id);
 
             if (usuarioExistente == null)
@@ -65,20 +76,15 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound("El usuario no existe.");
             }
 
-            // Actualizar propiedades del usuario existente con los valores proporcionados
-            usuarioExistente.Estatusid = usuario.Estatusid;
-            usuarioExistente.Rolid = usuario.Rolid;
-            usuarioExistente.Nombre = usuario.Nombre;
-            usuarioExistente.Apellido = usuario.Apellido;
-            usuarioExistente.Username = usuario.Username;
+            usuarioExistente.Nombre = usuarioDTO.Nombre;
+            usuarioExistente.Apellido = usuarioDTO.Apellido;
+            usuarioExistente.Username = usuarioDTO.Username;
 
-            // Solo actualizar la contraseña si se proporciona una nueva
-            if (!string.IsNullOrEmpty(usuario.Password))
+            if (!string.IsNullOrEmpty(usuarioDTO.Password))
             {
-                usuarioExistente.Password = _utilities.encriptarSHA256(usuario.Password);
+                usuarioExistente.Password = _utilities.encriptarSHA256(usuarioDTO.Password);
             }
 
-            // Marcar la entidad como modificada
             _context.Entry(usuarioExistente).State = EntityState.Modified;
 
             try
@@ -97,29 +103,21 @@ namespace impedimento_salidaAPI.Controllers
                 }
             }
 
-            return NoContent(); // O puede devolver Ok(usuarioExistente) para devolver el usuario actualizado
+            return NoContent();
         }
 
         // POST: api/Usuarios
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<ActionResult<Usuario>> PostUsuario(UsuarioDTO usuarioDTO)
         {
+            var usuario = _mapper.Map<Usuario>(usuarioDTO);
+            usuario.Password = _utilities.encriptarSHA256(usuarioDTO.Password);
 
-            var modeloUsuario = new Usuario
-            {
-                Estatusid = usuario.Estatusid,
-                Rolid = usuario.Rolid,
-                Nombre = usuario.Nombre,
-                Apellido = usuario.Apellido,
-                Username = usuario.Username,
-                Password = _utilities.encriptarSHA256(usuario.Password)
-            };
-
-            await _context.Usuarios.AddAsync(modeloUsuario);
+            await _context.Usuarios.AddAsync(usuario);
             await _context.SaveChangesAsync();
 
-            if (modeloUsuario.Id != 0)
+            if (usuario.Id != 0)
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = true });
             else
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });

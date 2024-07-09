@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
+using AutoMapper;
+using impedimento_salidaAPI.Models.DTOs;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -16,23 +18,54 @@ namespace impedimento_salidaAPI.Controllers
     public class SolicitudLevantamientoController : ControllerBase
     {
         private readonly ImpedimentoSalidaContext _context;
+        private readonly IMapper _mapper;
 
-        public SolicitudLevantamientoController(ImpedimentoSalidaContext context)
+
+        public SolicitudLevantamientoController(ImpedimentoSalidaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/SolicitudLevantamiento
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SolicitudLevantamiento>>> GetSolicitudLevantamientos()
+        public async Task<ActionResult<IEnumerable<SolicitudLevantamientoDTO>>> GetSolicitudLevantamientos()
         {
-            return await _context.SolicitudLevantamientos.ToListAsync();
+            var solicitudesLevantamiento = await _context.SolicitudLevantamientos
+                            .Include(s => s.Estatus)
+                            .ToListAsync();
+            var solicitudesLevantamientoDTO = _mapper.Map<List<SolicitudLevantamientoDTO>>(solicitudesLevantamiento);
+            return Ok(solicitudesLevantamientoDTO);
         }
 
         // GET: api/SolicitudLevantamiento/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SolicitudLevantamiento>> GetSolicitudLevantamiento(int id)
+        public async Task<ActionResult<SolicitudLevantamientoDTO>> GetSolicitudLevantamiento(int id)
         {
+            var solicitudLevantamiento = await _context.SolicitudLevantamientos
+                .Include(s => s.Estatus)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+
+            if (solicitudLevantamiento == null)
+            {
+                return NotFound();
+            }
+
+            var solicitudesLevantamientoDTO = _mapper.Map<List<SolicitudLevantamientoDTO>>(solicitudLevantamiento);
+            return Ok(solicitudesLevantamientoDTO);
+        }
+
+        // PUT: api/SolicitudLevantamiento/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSolicitudLevantamiento(int id, SolicitudLevantamientoDTO solicitudLevantamientoDTO)
+        {
+            if (id != solicitudLevantamientoDTO.Id)
+            {
+                return BadRequest();
+            }
+
             var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
 
             if (solicitudLevantamiento == null)
@@ -40,20 +73,9 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            return solicitudLevantamiento;
-        }
+            _mapper.Map(solicitudLevantamientoDTO, solicitudLevantamiento);
 
-        // PUT: api/SolicitudLevantamiento/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSolicitudLevantamiento(int id, SolicitudLevantamiento solicitudLevantamiento)
-        {
-            if (id != solicitudLevantamiento.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(solicitudLevantamiento).State = EntityState.Modified;
+            _context.Entry(solicitudLevantamientoDTO).State = EntityState.Modified;
 
             try
             {
@@ -118,8 +140,9 @@ namespace impedimento_salidaAPI.Controllers
         // POST: api/SolicitudLevantamiento
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SolicitudLevantamiento>> PostSolicitudLevantamiento(SolicitudLevantamiento solicitudLevantamiento)
+        public async Task<ActionResult<SolicitudLevantamiento>> PostSolicitudLevantamiento(SolicitudLevantamientoDTO solicitudLevantamientoDTO)
         {
+            var solicitudLevantamiento = _mapper.Map<SolicitudLevantamiento>(solicitudLevantamientoDTO);
             _context.SolicitudLevantamientos.Add(solicitudLevantamiento);
             await _context.SaveChangesAsync();
 
