@@ -49,7 +49,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var rolesDTO = _mapper.Map<List<RoleDTO>>(role);
+            var rolesDTO = _mapper.Map<RoleDTO>(role);
             return Ok(rolesDTO);
         }
 

@@ -48,7 +48,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var rechazosDTO = _mapper.Map<List<RechazoDTO>>(rechazo);
+            var rechazosDTO = _mapper.Map<RechazoDTO>(rechazo);
             return Ok(rechazosDTO);
         }
 

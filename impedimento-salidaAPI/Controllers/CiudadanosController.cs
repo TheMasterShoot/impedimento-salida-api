@@ -49,7 +49,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var ciudadanosDTO = _mapper.Map<List<CiudadanoDTO>>(ciudadano);
+            var ciudadanosDTO = _mapper.Map<CiudadanoDTO>(ciudadano);
             return Ok(ciudadanosDTO);
         }
 

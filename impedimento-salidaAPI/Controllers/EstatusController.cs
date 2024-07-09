@@ -51,7 +51,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var estatusDTO = _mapper.Map<List<EstatusDTO>>(estatus);
+            var estatusDTO = _mapper.Map<EstatusDTO>(estatus);
             return Ok(estatusDTO);
         }
 

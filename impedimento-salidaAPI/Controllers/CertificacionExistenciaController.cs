@@ -50,7 +50,7 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var certificacionesExistenciaDTO = _mapper.Map<List<CertificacionExistenciumDTO>>(certificacionExistencium);
+            var certificacionesExistenciaDTO = _mapper.Map<CertificacionExistenciumDTO>(certificacionExistencium);
             return Ok(certificacionesExistenciaDTO);
         }
 

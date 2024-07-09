@@ -10,6 +10,7 @@ using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
 using AutoMapper;
 using impedimento_salidaAPI.Models.DTOs;
+using impedimento_salidaAPI.Custom;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -52,8 +53,8 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var solicitudesLevantamientoDTO = _mapper.Map<List<SolicitudLevantamientoDTO>>(solicitudLevantamiento);
-            return Ok(solicitudesLevantamientoDTO);
+            var solicitudLevantamientoDTO = _mapper.Map<SolicitudLevantamientoDTO>(solicitudLevantamiento);
+            return Ok(solicitudLevantamientoDTO);
         }
 
         // PUT: api/SolicitudLevantamiento/5
