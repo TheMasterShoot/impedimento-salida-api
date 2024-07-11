@@ -87,7 +87,19 @@ namespace impedimento_salidaAPI.Custom
                .ForMember(destino =>
                    destino.EstatusDesc,
                    opt => opt.MapFrom(origen => origen.Estatus.Descripcion)
-               );
+               )
+               .ForMember(dest => 
+                    dest.Carta, 
+                    opt => opt.MapFrom(src => ConvertStringToFormFile(src.Carta))
+                )
+               .ForMember(dest =>
+                    dest.Sentencia,
+                    opt => opt.MapFrom(src => ConvertStringToFormFile(src.Sentencia))
+                )
+               .ForMember(dest =>
+                    dest.NoRecurso,
+                    opt => opt.MapFrom(src => ConvertStringToFormFile(src.NoRecurso))
+                );
 
             CreateMap<SolicitudLevantamientoDTO, SolicitudLevantamiento>()
             .ForMember(destino =>
@@ -105,9 +117,41 @@ namespace impedimento_salidaAPI.Custom
             #endregion Menu
 
             #region MenuRol 
-            CreateMap<Menurol, MenuRolDTO>().ReverseMap();
+            CreateMap<Menurol, MenuRolDTO>()
+               .ForMember(destino =>
+                   destino.RolDesc,
+                   opt => opt.MapFrom(origen => origen.IdrolNavigation.Rol)
+               ).ForMember(destino =>
+                   destino.MenuDesc,
+                   opt => opt.MapFrom(origen => origen.IdmenuNavigation.Descripcion)
+               );
+
+            CreateMap<MenuRolDTO, Menurol>()
+            .ForMember(destino =>
+                destino.IdrolNavigation,
+                opt => opt.Ignore()
+            ).ForMember(destino =>
+                destino.IdmenuNavigation,
+                opt => opt.Ignore()
+            );
             #endregion MenuRol
 
+        }
+
+        private IFormFile ConvertStringToFormFile(string fileContent)
+        {
+            if (string.IsNullOrEmpty(fileContent))
+            {
+                return null;
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
+            var stream = new MemoryStream(bytes);
+            return new FormFile(stream, 0, stream.Length, null, "file.txt")
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "application/octet-stream"
+            };
         }
     }
 }

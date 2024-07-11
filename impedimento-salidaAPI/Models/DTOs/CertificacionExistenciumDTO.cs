@@ -20,7 +20,7 @@
 
         public DateOnly? FechaSolicitud { get; set; }
 
-        public string Carta { get; set; } = null!;
+        public string? Email { get; set; }
 
         public DateOnly? FechaAprobacion { get; set; }
 

@@ -10,4 +10,8 @@ public partial class Menurol
     public int? Idmenu { get; set; }
 
     public int? Idrol { get; set; }
+
+    public virtual Menu? IdmenuNavigation { get; set; }
+
+    public virtual Role? IdrolNavigation { get; set; }
 }

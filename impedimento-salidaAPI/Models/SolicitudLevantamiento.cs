@@ -27,15 +27,17 @@ public partial class SolicitudLevantamiento
 
     public string? LevantamientoTipo { get; set; }
 
-    public byte[]? Carta { get; set; }
+    public string? Email { get; set; }
 
-    public byte[]? Sentencia { get; set; }
+    public string? Carta { get; set; }
 
-    public byte[]? NoRecurso { get; set; }
+    public string? Sentencia { get; set; }
 
-    public virtual Ciudadano? Ciudadano { get; set; }
+    public string? NoRecurso { get; set; }
 
-    public virtual Estatus? Estatus { get; set; }
+    public virtual Ciudadano Ciudadano { get; set; } = null!;
+
+    public virtual Estatus Estatus { get; set; } = null!;
 
     public virtual ICollection<Rechazo> Rechazos { get; set; } = new List<Rechazo>();
 }

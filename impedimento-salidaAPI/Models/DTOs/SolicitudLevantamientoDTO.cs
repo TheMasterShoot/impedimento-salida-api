@@ -26,11 +26,13 @@
 
         public string? LevantamientoTipo { get; set; }
 
-        public byte[]? Carta { get; set; }
+        public string? Email { get; set; }
 
-        public byte[]? Sentencia { get; set; }
+        public IFormFile? Carta { get; set; }
 
-        public byte[]? NoRecurso { get; set; }
+        public IFormFile? Sentencia { get; set; }
+
+        public IFormFile? NoRecurso { get; set; }
 
         public virtual ICollection<RechazoDTO>? Rechazos { get; set; }
     }

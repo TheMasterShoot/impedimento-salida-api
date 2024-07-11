@@ -21,8 +21,6 @@ public partial class CertificacionExistencium
 
     public DateOnly FechaSolicitud { get; set; }
 
-    public string Carta { get; set; } = null!;
-
     public DateOnly? FechaAprobacion { get; set; }
 
     public string? UsuarioAprobacion { get; set; }
@@ -30,6 +28,8 @@ public partial class CertificacionExistencium
     public string? Reporte { get; set; }
 
     public string? Impedimento { get; set; }
+
+    public string? Email { get; set; }
 
     public virtual ICollection<Ca> CasNavigation { get; set; } = new List<Ca>();
 

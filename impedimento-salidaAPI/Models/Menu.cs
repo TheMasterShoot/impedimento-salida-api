@@ -12,4 +12,6 @@ public partial class Menu
     public string? Icono { get; set; }
 
     public string? Url { get; set; }
+
+    public virtual ICollection<Menurol> Menurols { get; set; } = new List<Menurol>();
 }

@@ -11,5 +11,7 @@ public partial class Role
 
     public virtual ICollection<Ciudadano> Ciudadanos { get; set; } = new List<Ciudadano>();
 
+    public virtual ICollection<Menurol> Menurols { get; set; } = new List<Menurol>();
+
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

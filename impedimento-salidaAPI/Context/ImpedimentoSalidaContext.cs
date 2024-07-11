@@ -75,9 +75,6 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("APELLIDO");
-            entity.Property(e => e.Carta)
-                .HasColumnType("text")
-                .HasColumnName("CARTA");
             entity.Property(e => e.Cas)
                 .HasMaxLength(15)
                 .HasColumnName("CAS");
@@ -85,6 +82,10 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasMaxLength(11)
                 .HasColumnName("CEDULA");
             entity.Property(e => e.Ciudadanoid).HasColumnName("CIUDADANOID");
+            entity.Property(e => e.Email)
+                .HasMaxLength(75)
+                .IsUnicode(false)
+                .HasColumnName("EMAIL");
             entity.Property(e => e.Estatusid).HasColumnName("ESTATUSID");
             entity.Property(e => e.FechaAprobacion).HasColumnName("FECHA_APROBACION");
             entity.Property(e => e.FechaSolicitud).HasColumnName("FECHA_SOLICITUD");
@@ -208,6 +209,14 @@ public partial class ImpedimentoSalidaContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Idmenu).HasColumnName("IDMENU");
             entity.Property(e => e.Idrol).HasColumnName("IDROL");
+
+            entity.HasOne(d => d.IdmenuNavigation).WithMany(p => p.Menurols)
+                .HasForeignKey(d => d.Idmenu)
+                .HasConstraintName("FK_MENUROL_IDMENU");
+
+            entity.HasOne(d => d.IdrolNavigation).WithMany(p => p.Menurols)
+                .HasForeignKey(d => d.Idrol)
+                .HasConstraintName("FK_MENUROL_IDROL");
         });
 
         modelBuilder.Entity<Rechazo>(entity =>
@@ -256,11 +265,17 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("APELLIDO");
-            entity.Property(e => e.Carta).HasColumnName("CARTA");
+            entity.Property(e => e.Carta)
+                .HasColumnType("text")
+                .HasColumnName("CARTA");
             entity.Property(e => e.Cedula)
                 .HasMaxLength(11)
                 .HasColumnName("CEDULA");
             entity.Property(e => e.Ciudadanoid).HasColumnName("CIUDADANOID");
+            entity.Property(e => e.Email)
+                .HasMaxLength(75)
+                .IsUnicode(false)
+                .HasColumnName("EMAIL");
             entity.Property(e => e.Estatusid).HasColumnName("ESTATUSID");
             entity.Property(e => e.FechaAprobacion).HasColumnName("FECHA_APROBACION");
             entity.Property(e => e.FechaSolicitud).HasColumnName("FECHA_SOLICITUD");
@@ -268,7 +283,9 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasMaxLength(2)
                 .IsUnicode(false)
                 .HasColumnName("LEVANTAMIENTO_TIPO");
-            entity.Property(e => e.NoRecurso).HasColumnName("NO_RECURSO");
+            entity.Property(e => e.NoRecurso)
+                .HasColumnType("text")
+                .HasColumnName("NO_RECURSO");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -276,7 +293,9 @@ public partial class ImpedimentoSalidaContext : DbContext
             entity.Property(e => e.Reporte)
                 .HasColumnType("text")
                 .HasColumnName("REPORTE");
-            entity.Property(e => e.Sentencia).HasColumnName("SENTENCIA");
+            entity.Property(e => e.Sentencia)
+                .HasColumnType("text")
+                .HasColumnName("SENTENCIA");
             entity.Property(e => e.UsuarioAprobacion)
                 .HasMaxLength(50)
                 .IsUnicode(false)

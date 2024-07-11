@@ -8,6 +8,8 @@
 
         public virtual ICollection<CiudadanoDTO>? Ciudadanos { get; set; }
 
+        public virtual ICollection<Menurol>? Menurols { get; set; }
+
         public virtual ICollection<UsuarioDTO>? Usuarios { get; set; }
     }
 }
