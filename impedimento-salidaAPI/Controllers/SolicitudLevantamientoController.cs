@@ -11,6 +11,7 @@ using impedimento_salidaAPI.Models;
 using AutoMapper;
 using impedimento_salidaAPI.Models.DTOs;
 using impedimento_salidaAPI.Custom;
+using Microsoft.AspNetCore.Hosting;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -73,43 +74,6 @@ namespace impedimento_salidaAPI.Controllers
         // PUT: api/SolicitudLevantamiento/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        //public async Task<IActionResult> PutSolicitudLevantamiento(int id, SolicitudLevantamientoDTO solicitudLevantamientoDTO)
-        //{
-        //    if (id != solicitudLevantamientoDTO.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
-
-        //    if (solicitudLevantamiento == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _mapper.Map(solicitudLevantamientoDTO, solicitudLevantamiento);
-
-        //    _context.Entry(solicitudLevantamientoDTO).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!SolicitudLevantamientoExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
         public async Task<IActionResult> PutSolicitudLevantamiento(int id, [FromForm] SolicitudLevantamientoDTO solicitudLevantamientoDTO)
         {
             if (id != solicitudLevantamientoDTO.Id)
@@ -123,8 +87,17 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
+            //nombre de nueva carpeta
+            var folderName = solicitudLevantamientoDTO.Cedula;
             // Directorio donde se guardarán los archivos
-            var uploadPath = "D:\\Tesis\\impedimento-salidaAPI\\impedimento-salidaAPI\\Documentos\\";
+            var folderPath = "D:\\Tesis\\impedimento-salidaAPI\\impedimento-salidaAPI\\Documentos\\";
+            var uploadPath = Path.Combine(folderPath, folderName);
+
+            //creacion de la nueva carpeta dentro del directorio
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
 
             // Guardar archivo de carta
             if (solicitudLevantamientoDTO.Carta != null && solicitudLevantamientoDTO.Carta.Length > 0)
@@ -148,6 +121,18 @@ namespace impedimento_salidaAPI.Controllers
                 solicitudLevantamiento.Sentencia = sentenciaFileName;
             }
 
+            // Guardar archivo de noRecurso
+            if (solicitudLevantamientoDTO.NoRecurso != null && solicitudLevantamientoDTO.NoRecurso.Length > 0)
+            {
+                var noRecursoFileName = Path.Combine(uploadPath, solicitudLevantamientoDTO.NoRecurso.FileName);
+                using (var stream = new FileStream(noRecursoFileName, FileMode.Create))
+                {
+                    await solicitudLevantamientoDTO.NoRecurso.CopyToAsync(stream);
+                }
+                solicitudLevantamiento.NoRecurso = noRecursoFileName;
+            }
+
+            //continuacion de logica de PUT
             _context.Entry(solicitudLevantamiento).State = EntityState.Modified;
 
             try
@@ -213,23 +198,22 @@ namespace impedimento_salidaAPI.Controllers
 
         // POST: api/SolicitudLevantamiento
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        //public async Task<ActionResult<SolicitudLevantamiento>> PostSolicitudLevantamiento(SolicitudLevantamientoDTO solicitudLevantamientoDTO)
-        //{
-        //    var solicitudLevantamiento = _mapper.Map<SolicitudLevantamiento>(solicitudLevantamientoDTO);
-        //    _context.SolicitudLevantamientos.Add(solicitudLevantamiento);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetSolicitudLevantamiento", new { id = solicitudLevantamiento.Id }, solicitudLevantamiento);
-        //}
-
-
+        [HttpPost]        
         public async Task<ActionResult<SolicitudLevantamiento>> PostSolicitudLevantamiento([FromForm] SolicitudLevantamientoDTO solicitudLevantamientoDTO)
         {
             var solicitudLevantamiento = _mapper.Map<SolicitudLevantamiento>(solicitudLevantamientoDTO);
 
+            //nombre de nueva carpeta
+            var folderName = solicitudLevantamientoDTO.Cedula;
             // Directorio donde se guardarán los archivos
-            var uploadPath = "D:\\Tesis\\impedimento-salidaAPI\\impedimento-salidaAPI\\Documentos\\";
+            var folderPath = "D:\\Tesis\\impedimento-salidaAPI\\impedimento-salidaAPI\\Documentos\\";
+            var uploadPath = Path.Combine(folderPath, folderName);
+
+            //creacion de la nueva carpeta dentro del directorio
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
 
             // Guardar archivo de carta
             if (solicitudLevantamientoDTO.Carta != null && solicitudLevantamientoDTO.Carta.Length > 0)
@@ -264,6 +248,7 @@ namespace impedimento_salidaAPI.Controllers
                 solicitudLevantamiento.NoRecurso = noRecursoFileName;
             }
 
+            // continuacion de logica POST
             _context.SolicitudLevantamientos.Add(solicitudLevantamiento);
             await _context.SaveChangesAsync();
 
