@@ -79,6 +79,9 @@ namespace impedimento_salidaAPI.Controllers
             usuarioExistente.Nombre = usuarioDTO.Nombre;
             usuarioExistente.Apellido = usuarioDTO.Apellido;
             usuarioExistente.Username = usuarioDTO.Username;
+            usuarioExistente.Rolid = usuarioDTO.Rolid;
+            usuarioExistente.Estatusid = usuarioDTO.Estatusid;
+
 
             if (!string.IsNullOrEmpty(usuarioDTO.Password))
             {

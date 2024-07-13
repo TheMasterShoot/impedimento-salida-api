@@ -32,9 +32,9 @@ namespace impedimento_salidaAPI.Controllers
         public async Task<ActionResult<IEnumerable<EstatusDTO>>> GetEstatuses()
         {
             var estatuses = await _context.Estatuses
-                .Include(c => c.TipoCodigoNavigation)
+                .Include(e => e.TipoCodigoNavigation)
                 .ToListAsync();
-            var estatusDTO = _mapper.Map<List<CiudadanoDTO>>(estatuses);
+            var estatusDTO = _mapper.Map<List<EstatusDTO>>(estatuses);
             return Ok(estatusDTO);
         }
 
