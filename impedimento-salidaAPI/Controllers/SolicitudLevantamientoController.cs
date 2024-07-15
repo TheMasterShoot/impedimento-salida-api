@@ -155,7 +155,7 @@ namespace impedimento_salidaAPI.Controllers
         }
 
 
-        // PATCH: api/SolicitudLevantamiento/5
+        //PATCH: api/SolicitudLevantamiento/5
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchSolicitudLevantamiento(int id, [FromBody] JsonPatchDocument<SolicitudLevantamiento> patchDoc)
         {
@@ -172,7 +172,7 @@ namespace impedimento_salidaAPI.Controllers
 
             patchDoc.ApplyTo(solicitudLevantamiento, ModelState);
 
-            if (!TryValidateModel(solicitudLevantamiento))
+            if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
@@ -195,6 +195,49 @@ namespace impedimento_salidaAPI.Controllers
 
             return NoContent();
         }
+
+        //[HttpPatch("{id}")]
+        //public async Task<IActionResult> PatchSolicitudLevantamiento(int id, [FromBody] JsonPatchDocument<SolicitudLevantamientoDTO> patchDoc)
+        //{
+        //    if (patchDoc == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
+        //    if (solicitudLevantamiento == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var solicitudLevantamientoDTO = _mapper.Map<SolicitudLevantamientoDTO>(solicitudLevantamiento);
+        //    patchDoc.ApplyTo(solicitudLevantamientoDTO, ModelState);
+
+        //    if (!TryValidateModel(solicitudLevantamientoDTO))
+        //    {
+        //        return ValidationProblem(ModelState);
+        //    }
+
+        //    _mapper.Map(solicitudLevantamientoDTO, solicitudLevantamiento);
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!SolicitudLevantamientoExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
 
         // POST: api/SolicitudLevantamiento
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

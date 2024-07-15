@@ -22,26 +22,6 @@ namespace impedimento_salidaAPI.Controllers
             _context = context;
             _utilities = utilities;
         }
-        //[HttpPost]
-        //[Route("Registrarse")]
-        //public async Task<IActionResult> Registrarse(UsuarioDTO objeto)
-        //{
-
-        //    var modeloUsuario = new Usuario
-        //    {
-        //        Nombre = objeto.Nombre,
-        //        Correo = objeto.Correo,
-        //        Clave = _utilidades.encriptarSHA256(objeto.Clave)
-        //    };
-
-        //    await _dbPruebaContext.Usuarios.AddAsync(modeloUsuario);
-        //    await _dbPruebaContext.SaveChangesAsync();
-
-        //    if (modeloUsuario.IdUsuario != 0)
-        //        return StatusCode(StatusCodes.Status200OK, new { isSuccess = true });
-        //    else
-        //        return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
-        //}
 
         [HttpPost]
         [Route("Login")]
@@ -57,7 +37,7 @@ namespace impedimento_salidaAPI.Controllers
             if (usuarioEncontrado == null)
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = false, token = "" });
             else
-                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilities.generarJWT(usuarioEncontrado) });
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilities.generarJWT(usuarioEncontrado), user = objeto.Username });
         }
 
         [HttpGet]

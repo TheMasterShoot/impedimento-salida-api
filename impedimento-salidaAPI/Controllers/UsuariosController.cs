@@ -10,6 +10,7 @@ using impedimento_salidaAPI.Models;
 using impedimento_salidaAPI.Models.DTOs;
 using impedimento_salidaAPI.Custom;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 
 
 namespace impedimento_salidaAPI.Controllers
@@ -83,6 +84,75 @@ namespace impedimento_salidaAPI.Controllers
             usuarioExistente.Estatusid = usuarioDTO.Estatusid;
 
 
+            if (!string.IsNullOrEmpty(usuarioDTO.Password))
+            {
+                usuarioExistente.Password = _utilities.encriptarSHA256(usuarioDTO.Password);
+            }
+
+            _context.Entry(usuarioExistente).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UsuarioExists(id))
+                {
+                    return NotFound("El usuario no existe.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+        // patch
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchUsuario(int id, JsonPatchDocument<UsuarioDTO> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest("El documento de patch es nulo.");
+            }
+
+            var usuarioExistente = await _context.Usuarios.FindAsync(id);
+
+            if (usuarioExistente == null)
+            {
+                return NotFound("El usuario no existe.");
+            }
+
+            // Convertir el usuario existente a un UsuarioDTO
+            var usuarioDTO = new UsuarioDTO
+            {
+                Id = usuarioExistente.Id,
+                Nombre = usuarioExistente.Nombre,
+                Apellido = usuarioExistente.Apellido,
+                Username = usuarioExistente.Username,
+                Rolid = usuarioExistente.Rolid,
+                Estatusid = usuarioExistente.Estatusid
+                // Nota: No incluimos Password aquí ya que es un campo sensible.
+            };
+
+            // Aplicar el patch al UsuarioDTO
+            patchDoc.ApplyTo(usuarioDTO, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Actualizar los campos del usuario existente con los valores del DTO parcheado
+            usuarioExistente.Nombre = usuarioDTO.Nombre;
+            usuarioExistente.Apellido = usuarioDTO.Apellido;
+            usuarioExistente.Username = usuarioDTO.Username;
+            usuarioExistente.Rolid = usuarioDTO.Rolid;
+            usuarioExistente.Estatusid = usuarioDTO.Estatusid;
+
+            // Si se proporciona una nueva contraseña en el patch, encriptarla y actualizarla
             if (!string.IsNullOrEmpty(usuarioDTO.Password))
             {
                 usuarioExistente.Password = _utilities.encriptarSHA256(usuarioDTO.Password);
