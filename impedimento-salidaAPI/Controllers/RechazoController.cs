@@ -9,6 +9,7 @@ using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
 using AutoMapper;
 using impedimento_salidaAPI.Models.DTOs;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -50,6 +51,47 @@ namespace impedimento_salidaAPI.Controllers
 
             var rechazosDTO = _mapper.Map<RechazoDTO>(rechazo);
             return Ok(rechazosDTO);
+        }
+
+        //PATCH: api/Rechazo/5
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchRechazo(int id, [FromBody] JsonPatchDocument<Rechazo> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var rechazo = await _context.Rechazos.FindAsync(id);
+            if (rechazo == null)
+            {
+                return NotFound();
+            }
+
+            patchDoc.ApplyTo(rechazo, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RechazoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
         // PUT: api/Rechazo/5
