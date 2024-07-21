@@ -22,6 +22,10 @@
 
         public string? Email { get; set; }
 
+        public string? ExisteImpedimento { get; set; }
+
+        public string? Referencia { get; set; }
+
         public DateOnly? FechaAprobacion { get; set; }
 
         public string? UsuarioAprobacion { get; set; }

@@ -35,9 +35,11 @@ public partial class SolicitudLevantamiento
 
     public string? NoRecurso { get; set; }
 
-    public virtual Ciudadano? Ciudadano { get; set; } = null!;
+    public string? Referencia { get; set; }
 
-    public virtual Estatus? Estatus { get; set; } = null!;
+    public virtual Ciudadano Ciudadano { get; set; } = null!;
+
+    public virtual Estatus Estatus { get; set; } = null!;
 
     public virtual ICollection<Rechazo> Rechazos { get; set; } = new List<Rechazo>();
 }

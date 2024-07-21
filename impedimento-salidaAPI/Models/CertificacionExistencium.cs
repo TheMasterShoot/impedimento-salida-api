@@ -27,9 +27,11 @@ public partial class CertificacionExistencium
 
     public string? Reporte { get; set; }
 
-    public string? Impedimento { get; set; }
-
     public string? Email { get; set; }
+
+    public string? ExisteImpedimento { get; set; }
+
+    public string? Referencia { get; set; }
 
     public virtual ICollection<Ca> CasNavigation { get; set; } = new List<Ca>();
 

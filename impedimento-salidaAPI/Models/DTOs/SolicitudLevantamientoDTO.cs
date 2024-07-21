@@ -26,6 +26,8 @@
 
         public string? LevantamientoTipo { get; set; }
 
+        public string? Referencia { get; set; }
+
         public string? Email { get; set; }
 
         public IFormFile? Carta { get; set; }

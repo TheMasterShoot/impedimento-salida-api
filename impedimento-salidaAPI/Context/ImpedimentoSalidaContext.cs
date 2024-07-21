@@ -87,16 +87,20 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("EMAIL");
             entity.Property(e => e.Estatusid).HasColumnName("ESTATUSID");
+            entity.Property(e => e.ExisteImpedimento)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("EXISTE_IMPEDIMENTO");
             entity.Property(e => e.FechaAprobacion).HasColumnName("FECHA_APROBACION");
             entity.Property(e => e.FechaSolicitud).HasColumnName("FECHA_SOLICITUD");
-            entity.Property(e => e.Impedimento)
-                .HasMaxLength(2)
-                .IsUnicode(false)
-                .HasColumnName("IMPEDIMENTO");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("NOMBRE");
+            entity.Property(e => e.Referencia)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("REFERENCIA");
             entity.Property(e => e.Reporte)
                 .HasColumnType("text")
                 .HasColumnName("REPORTE");
@@ -280,7 +284,7 @@ public partial class ImpedimentoSalidaContext : DbContext
             entity.Property(e => e.FechaAprobacion).HasColumnName("FECHA_APROBACION");
             entity.Property(e => e.FechaSolicitud).HasColumnName("FECHA_SOLICITUD");
             entity.Property(e => e.LevantamientoTipo)
-                .HasMaxLength(2)
+                .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("LEVANTAMIENTO_TIPO");
             entity.Property(e => e.NoRecurso)
@@ -290,6 +294,10 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("NOMBRE");
+            entity.Property(e => e.Referencia)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("REFERENCIA");
             entity.Property(e => e.Reporte)
                 .HasColumnType("text")
                 .HasColumnName("REPORTE");
