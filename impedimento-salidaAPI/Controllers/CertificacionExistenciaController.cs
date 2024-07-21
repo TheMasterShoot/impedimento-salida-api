@@ -9,6 +9,7 @@ using impedimento_salidaAPI.Context;
 using impedimento_salidaAPI.Models;
 using AutoMapper;
 using impedimento_salidaAPI.Models.DTOs;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace impedimento_salidaAPI.Controllers
 {
@@ -74,6 +75,47 @@ namespace impedimento_salidaAPI.Controllers
             _mapper.Map(certificacionExistenciumDTO, certificacionExistencium);
 
             _context.Entry(certificacionExistencium).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CertificacionExistenciumExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        //PATCH: api/CertificacionExistencia/5
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchCertificacionExistencium(int id, [FromBody] JsonPatchDocument<CertificacionExistencium> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var certificacion = await _context.CertificacionExistencia.FindAsync(id);
+            if (certificacion == null)
+            {
+                return NotFound();
+            }
+
+            patchDoc.ApplyTo(certificacion, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
 
             try
             {
