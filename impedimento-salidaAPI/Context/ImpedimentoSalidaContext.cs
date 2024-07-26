@@ -93,6 +93,9 @@ public partial class ImpedimentoSalidaContext : DbContext
                 .HasColumnName("EXISTE_IMPEDIMENTO");
             entity.Property(e => e.FechaAprobacion).HasColumnName("FECHA_APROBACION");
             entity.Property(e => e.FechaSolicitud).HasColumnName("FECHA_SOLICITUD");
+            entity.Property(e => e.Motivo)
+                .HasColumnType("text")
+                .HasColumnName("MOTIVO");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false)

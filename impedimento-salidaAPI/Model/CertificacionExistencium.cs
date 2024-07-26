@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace impedimento_salidaAPI.Models;
+namespace impedimento_salidaAPI.Model;
 
 public partial class CertificacionExistencium
 {
@@ -31,9 +31,9 @@ public partial class CertificacionExistencium
 
     public string? ExisteImpedimento { get; set; }
 
-    public string? Motivo { get; set; }
-
     public string? Referencia { get; set; }
+
+    public string? Motivo { get; set; }
 
     public virtual ICollection<Ca> CasNavigation { get; set; } = new List<Ca>();
 

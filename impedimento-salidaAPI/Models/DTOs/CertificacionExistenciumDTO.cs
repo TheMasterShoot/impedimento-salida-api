@@ -24,6 +24,8 @@
 
         public string? ExisteImpedimento { get; set; }
 
+        public string? Motivo { get; set; }
+
         public string? Referencia { get; set; }
 
         public DateOnly? FechaAprobacion { get; set; }

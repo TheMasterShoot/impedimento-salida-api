@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace impedimento_salidaAPI.Models;
+namespace impedimento_salidaAPI.Model;
 
-public partial class CertificacionExistencium
+public partial class SolicitudLevantamiento
 {
     public int Id { get; set; }
 
     public int Ciudadanoid { get; set; }
 
     public int Estatusid { get; set; }
-
-    public string Cas { get; set; } = null!;
 
     public string Cedula { get; set; } = null!;
 
@@ -27,15 +25,17 @@ public partial class CertificacionExistencium
 
     public string? Reporte { get; set; }
 
+    public string? LevantamientoTipo { get; set; }
+
     public string? Email { get; set; }
 
-    public string? ExisteImpedimento { get; set; }
+    public string? Carta { get; set; }
 
-    public string? Motivo { get; set; }
+    public string? Sentencia { get; set; }
+
+    public string? NoRecurso { get; set; }
 
     public string? Referencia { get; set; }
-
-    public virtual ICollection<Ca> CasNavigation { get; set; } = new List<Ca>();
 
     public virtual Ciudadano Ciudadano { get; set; } = null!;
 
