@@ -48,7 +48,7 @@ namespace impedimento_salidaAPI.Custom
             //crear detalle del token
             var jwtConfig = new JwtSecurityToken(
                 claims: userClaims,
-                expires: DateTime.UtcNow.AddMinutes(60),
+                expires: DateTime.UtcNow.AddMinutes(120),
                 signingCredentials: credentials
                 );
 
