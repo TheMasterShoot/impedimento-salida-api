@@ -86,6 +86,8 @@ namespace impedimento_salidaAPI.Controllers
             {
                 return NotFound();
             }
+            solicitudLevantamiento.Email = solicitudLevantamientoDTO.Email;
+            solicitudLevantamiento.Estatusid = solicitudLevantamientoDTO.Estatusid;
 
             //nombre de nueva carpeta
             var folderName = solicitudLevantamientoDTO.Cedula;
@@ -131,6 +133,7 @@ namespace impedimento_salidaAPI.Controllers
                 }
                 solicitudLevantamiento.NoRecurso = noRecursoFileName;
             }
+
 
             //continuacion de logica de PUT
             _context.Entry(solicitudLevantamiento).State = EntityState.Modified;
