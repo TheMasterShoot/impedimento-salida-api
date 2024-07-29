@@ -42,7 +42,7 @@ namespace impedimento_salidaAPI.Controllers
 
         // GET: api/SolicitudLevantamiento/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SolicitudLevantamientoDTO>> GetSolicitudLevantamiento(int id)
+        public async Task<ActionResult<SolicitudLevantamiento>> GetSolicitudLevantamiento(int id)
         {
             var solicitudLevantamiento = await _context.SolicitudLevantamientos
                 .Include(s => s.Estatus)
@@ -54,22 +54,56 @@ namespace impedimento_salidaAPI.Controllers
                 return NotFound();
             }
 
-            var solicitudLevantamientoDTO = _mapper.Map<SolicitudLevantamientoDTO>(solicitudLevantamiento);
+            var solicitudLevantamientoDTO = _mapper.Map<SolicitudLevantamiento>(solicitudLevantamiento);
             return Ok(solicitudLevantamientoDTO);
         }
 
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<SolicitudLevantamiento>> GetSolicitudLevantamiento(int id)
-        //{
-        //    var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
+        [HttpGet("download/{cedula}/{filename}")]
+        public IActionResult DownloadFile(string cedula, string filename)
+        {
+            var folderPath = "D:\\Tesis\\impedimento-salidaAPI\\impedimento-salidaAPI\\Documentos\\";
+            var filePath = Path.Combine(folderPath, cedula, filename);
 
-        //    if (solicitudLevantamiento == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(new { Message = "File not found." });
+            }
 
-        //    return solicitudLevantamiento;
-        //}
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                stream.CopyTo(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, GetContentType(filePath), Path.GetFileName(filePath));
+        }
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+    {
+        {".txt", "text/plain"},
+        {".pdf", "application/pdf"},
+        {".doc", "application/vnd.ms-word"},
+        {".docx", "application/vnd.ms-word"},
+        {".xls", "application/vnd.ms-excel"},
+        {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {".png", "image/png"},
+        {".jpg", "image/jpeg"},
+        {".jpeg", "image/jpeg"},
+        {".gif", "image/gif"},
+        {".csv", "text/csv"}
+    };
+        }
+
 
         // PUT: api/SolicitudLevantamiento/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -198,49 +232,6 @@ namespace impedimento_salidaAPI.Controllers
 
             return NoContent();
         }
-
-        //[HttpPatch("{id}")]
-        //public async Task<IActionResult> PatchSolicitudLevantamiento(int id, [FromBody] JsonPatchDocument<SolicitudLevantamientoDTO> patchDoc)
-        //{
-        //    if (patchDoc == null)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    var solicitudLevantamiento = await _context.SolicitudLevantamientos.FindAsync(id);
-        //    if (solicitudLevantamiento == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var solicitudLevantamientoDTO = _mapper.Map<SolicitudLevantamientoDTO>(solicitudLevantamiento);
-        //    patchDoc.ApplyTo(solicitudLevantamientoDTO, ModelState);
-
-        //    if (!TryValidateModel(solicitudLevantamientoDTO))
-        //    {
-        //        return ValidationProblem(ModelState);
-        //    }
-
-        //    _mapper.Map(solicitudLevantamientoDTO, solicitudLevantamiento);
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!SolicitudLevantamientoExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
 
         // POST: api/SolicitudLevantamiento
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

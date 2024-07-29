@@ -88,8 +88,8 @@ namespace impedimento_salidaAPI.Custom
                    destino.EstatusDesc,
                    opt => opt.MapFrom(origen => origen.Estatus.Descripcion)
                )
-               .ForMember(dest => 
-                    dest.Carta, 
+               .ForMember(dest =>
+                    dest.Carta,
                     opt => opt.MapFrom(src => ConvertStringToFormFile(src.Carta))
                 )
                .ForMember(dest =>
