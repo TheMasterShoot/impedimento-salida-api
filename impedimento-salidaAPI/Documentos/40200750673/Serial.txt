@@ -1,0 +1,12 @@
+Toad for Oracle 2017 Edition v16.1.0.95
+----------------------------------------
+
+NOTA:
+- deshabilite conexion a internet
+- coloque los parametros de licencia, tanto el codigo como el site
+
+
+LicenseKey  : CJ2PFCQ6P49Q4WHQT2D03GNTVX2AN5DG6FWD04YL4QW625KT391J9YF38VKB92SNBWNW-RU-BOARD-BD
+SiteMessage : cr2384
+
+
