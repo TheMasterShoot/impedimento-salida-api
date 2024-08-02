@@ -1,6 +1,0 @@
-@impedimento_salidaAPI_HostAddress = http://localhost:5057
-
-GET {{impedimento_salidaAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

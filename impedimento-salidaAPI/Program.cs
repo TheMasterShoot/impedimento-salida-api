@@ -8,19 +8,16 @@ using Newtonsoft.Json;
 using System.Text;
 using AutoMapper;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Data.SqlClient;
+using System;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.OpenApi;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// configuracion de conexion a base de datos
-var connectionString = builder.Configuration.GetConnectionString("Connection");
-
-builder.Services.AddDbContext<ImpedimentoSalidaContext>(
-        options => options.UseSqlServer(connectionString)
-);
-
- // configuracion de politicas de cors
+// configuracion de politicas de cors
 builder.Services.AddCors(options =>
 {
     
@@ -77,6 +74,21 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // Agregar AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+//azure conexion
+var connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");//String.Empty;
+//if (builder.Environment.IsDevelopment())
+//{
+//    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+//    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+//}
+//else
+//{
+//    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+//}
+
+builder.Services.AddDbContext<ImpedimentoSalidaContext>(options =>
+    options.UseSqlServer(connection));
+
 
 var app = builder.Build();
 
@@ -89,13 +101,6 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(
-//           Path.Combine(builder.Environment.ContentRootPath, "Documentos")),
-//    RequestPath = "/Documentos"
-//});
-
 app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
@@ -104,4 +109,36 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+//app.MapGet("/Person", (ImpedimentoSalidaContext context) =>
+//{
+//    return context.Person.ToList();
+//})
+//.WithName("GetPersons")
+//.WithOpenApi();
+
+//app.MapPost("/Person", (Person person, ImpedimentoSalidaContext context) =>
+//{
+//    context.Add(person);
+//    context.SaveChanges();
+//})
+//.WithName("CreatePerson")
+//.WithOpenApi();
+
 app.Run();
+
+//public class Person
+//{
+//    public int Id { get; set; }
+//    public string FirstName { get; set; }
+//    public string LastName { get; set; }
+//}
+
+//public class PersonDbContext : DbContext
+//{
+//    public PersonDbContext(DbContextOptions<PersonDbContext> options)
+//        : base(options)
+//    {
+//    }
+
+//    public DbSet<Person> Person { get; set; }
+//}
