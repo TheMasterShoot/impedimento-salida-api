@@ -13,6 +13,10 @@ using System;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.OpenApi;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Humanizer.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -90,6 +94,11 @@ builder.Services.AddDbContext<ImpedimentoSalidaContext>(options =>
     options.UseSqlServer(connection));
 
 
+// configuracion de azureblobstorage
+string blobConnectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
+builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -109,36 +118,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//app.MapGet("/Person", (ImpedimentoSalidaContext context) =>
-//{
-//    return context.Person.ToList();
-//})
-//.WithName("GetPersons")
-//.WithOpenApi();
-
-//app.MapPost("/Person", (Person person, ImpedimentoSalidaContext context) =>
-//{
-//    context.Add(person);
-//    context.SaveChanges();
-//})
-//.WithName("CreatePerson")
-//.WithOpenApi();
-
 app.Run();
-
-//public class Person
-//{
-//    public int Id { get; set; }
-//    public string FirstName { get; set; }
-//    public string LastName { get; set; }
-//}
-
-//public class PersonDbContext : DbContext
-//{
-//    public PersonDbContext(DbContextOptions<PersonDbContext> options)
-//        : base(options)
-//    {
-//    }
-
-//    public DbSet<Person> Person { get; set; }
-//}
